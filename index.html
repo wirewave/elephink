@@ -213,7 +213,7 @@
 
     .progress-fill {
       height: 100%;
-      width: 3.88%;
+      width: 4.45%;
       background: linear-gradient(90deg, #9333ea, #c084fc);
       border-radius: 999px;
       transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -289,12 +289,12 @@
         <div class="stat-row">
           <div class="stat-box">
             <div class="stat-label">Live Market Cap</div>
-            <div class="stat-value" id="val-mcap">$3,874</div>
-            <div class="stat-sub" id="val-holders">11 Holders</div>
+            <div class="stat-value" id="val-mcap">$6,118</div>
+            <div class="stat-sub" id="val-holders">13 Holders</div>
           </div>
           <div class="stat-box">
             <div class="stat-label">Trunk Length</div>
-            <div class="stat-value" id="val-trunk">18.5 cm</div>
+            <div class="stat-value" id="val-trunk">23.2 cm</div>
             <div class="stat-sub">Live 3D Scaled</div>
           </div>
         </div>
@@ -302,13 +302,13 @@
         <div class="curve-card" style="margin-top: 1rem;">
           <div class="curve-header">
             <span class="stat-label">Bonding Curve Progress</span>
-            <span style="font-weight: 800; color: var(--accent);" id="val-percent">3.88%</span>
+            <span style="font-weight: 800; color: var(--accent);" id="val-percent">4.45%</span>
           </div>
           <div class="progress-track">
             <div class="progress-fill" id="progress-fill"></div>
           </div>
           <div style="display:flex; justify-content:space-between; margin-top: 0.6rem; font-size: 0.75rem; color: var(--muted);">
-            <span id="val-weth">0.1009 / 2.6000 WETH</span>
+            <span id="val-weth">0.1159 / 2.6000 WETH</span>
             <span>Target: 2.6 WETH</span>
           </div>
         </div>
@@ -324,7 +324,7 @@
 
       <div>
         <div style="font-size:0.75rem; color:var(--muted); margin-bottom: 0.75rem; text-align:center;">
-          API Source: <span style="color:#fff;">otomate.fun launcher037</span>
+          Data Sync: <span style="color:#fff;">Otomate Live Endpoint</span>
         </div>
         <a href="https://www.otomate.fun/swap?network=ink&token=0x661f11caa30dbd35dd734e98538c1e1b2f05a9cc" 
            target="_blank" 
@@ -336,14 +336,11 @@
   </div>
 
   <script>
-    const OTOMATE_API = "https://www.otomate.fun/api/launcher037/catalog?limit=1&after=0x661f11caa30dbd35dd734e98538c1e1b2f05a9cb";
     const TOKEN_CA = "0x661f11caa30dbd35dd734e98538c1e1b2f05a9cc";
     const TARGET_WETH = 2.6;
-    const ETH_PRICE_USD = 3200;
+    let targetExtension = 0.0445; // 4.45%
 
-    let targetExtension = 0.0388; // 3.88% default
-
-    // --- THREE.JS PURPLE ELEPHANT (SHADOWLESS) ---
+    // --- THREE.JS PURPLE ELEPHANT ---
     const container = document.getElementById('webgl-container');
     const scene = new THREE.Scene();
 
@@ -454,7 +451,7 @@
     elephant.add(createLeg(-0.48, 0.1));
     elephant.add(createLeg(0.48, 0.1));
 
-    // --- PROPORTIONALLY RIGGED 3D TRUNK ---
+    // Proportionally Rigged Trunk
     const TRUNK_SEGMENTS = 7;
     const trunkJoints = [];
     const trunkMeshes = [];
@@ -469,7 +466,7 @@
       const rBottom = baseRadiusTop * Math.pow(0.86, i + 1);
 
       const geom = new THREE.CylinderGeometry(rBottom, rTop, 1, 16);
-      geom.translate(0, -0.5, 0); // Anchor pivot at the top of the joint
+      geom.translate(0, -0.5, 0);
 
       const segMesh = new THREE.Mesh(geom, purpleSkinMat);
       joint.add(segMesh);
@@ -487,7 +484,6 @@
     }
 
     function updateTrunkPhysics(progressRatio, t) {
-      // Linear physical stretch: 1.0x at 0% up to 4.2x length at 100%
       const lengthMultiplier = 1.0 + (progressRatio * 3.2);
       const currentSegLength = baseSegLength * lengthMultiplier;
 
@@ -498,7 +494,6 @@
         }
       }
 
-      // Kinematic unfurl: Tucked curl at low %, dramatic skyward arch at high %
       const idleWave = Math.sin(t * 2) * 0.04;
       const baseLift = -0.2 - (progressRatio * 0.85);
       const curlStep = (0.35 * (1 - progressRatio)) - (0.28 * progressRatio);
@@ -516,14 +511,13 @@
       renderer.setSize(container.clientWidth, container.clientHeight);
     });
 
-    // --- LIVE DATA HANDLING ---
-    function applyMetrics(mcap, wethAmount, holdersCount) {
-      const progress = Math.min(100, Math.max(0, (wethAmount / TARGET_WETH) * 100));
-      targetExtension = progress / 100;
+    // --- APPLY METRICS TO UI ---
+    function applyMetrics(mcap, wethAmount, progressPercent, holdersCount) {
+      targetExtension = progressPercent / 100;
       
       document.getElementById('val-mcap').innerText = `$${Number(mcap).toLocaleString()}`;
-      document.getElementById('val-percent').innerText = `${progress.toFixed(2)}%`;
-      document.getElementById('progress-fill').style.width = `${progress.toFixed(2)}%`;
+      document.getElementById('val-percent').innerText = `${progressPercent.toFixed(2)}%`;
+      document.getElementById('progress-fill').style.width = `${progressPercent.toFixed(2)}%`;
       document.getElementById('val-weth').innerText = `${Number(wethAmount).toFixed(4)} / ${TARGET_WETH.toFixed(4)} WETH`;
       
       if (holdersCount !== undefined && holdersCount !== null) {
@@ -534,32 +528,53 @@
       document.getElementById('val-trunk').innerText = `${cm} cm`;
     }
 
+    // --- PARSE EXACT OTOMATE CATALOG PAYLOAD ---
     async function fetchOtomateData() {
+      const timestamp = Date.now();
+      const directUrl = `https://www.otomate.fun/api/launcher037/catalog?limit=1&after=0x661f11caa30dbd35dd734e98538c1e1b2f05a9cb`;
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}&_t=${timestamp}`;
+
       try {
-        const res = await fetch(OTOMATE_API);
-        if (!res.ok) throw new Error("API request failed");
-        
+        let res;
+        try {
+          res = await fetch(directUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error();
+        } catch {
+          res = await fetch(proxyUrl, { cache: "no-store" });
+        }
+
         const data = await res.json();
-        const item = Array.isArray(data) ? data[0] : (data.items ? data.items[0] : data);
+        
+        // Target projects list in the exact schema
+        const projects = data.projects || (Array.isArray(data) ? data : [data]);
+        const eleph = projects.find(p => (p.token || "").toLowerCase() === TOKEN_CA.toLowerCase()) || projects[0];
 
-        if (item) {
-          const holders = item.holdersCount ?? item.holders ?? item.numHolders ?? 11;
+        if (eleph) {
+          // 1. Holders: eleph.holders.count
+          const holders = eleph.holders?.count ? parseInt(eleph.holders.count) : 13;
 
-          let curveWeth = 0.1009;
-          const rawWeth = item.reserveQuote ?? item.collectedWeth ?? item.wethRaised ?? item.curveEth;
-          if (rawWeth) {
-            curveWeth = rawWeth > 1e10 ? rawWeth / 1e18 : Number(rawWeth);
+          // 2. Curve Progress: eleph.metrics.progressBps (445 -> 4.45%)
+          let progressPercent = 4.45;
+          if (eleph.metrics?.progressBps !== undefined) {
+            progressPercent = eleph.metrics.progressBps / 100;
           }
 
-          let mcap = item.marketCapUsd ?? item.fdv ?? item.marketCap;
-          if (!mcap) {
-            mcap = Math.round(curveWeth * ETH_PRICE_USD * 12);
+          // 3. WETH Contributed: eleph.metrics.currentQuoteRaw (in wei)
+          let currentWeth = 0.1159;
+          if (eleph.metrics?.currentQuoteRaw) {
+            currentWeth = Number(eleph.metrics.currentQuoteRaw) / 1e18;
           }
 
-          applyMetrics(Math.round(mcap), curveWeth, holders);
+          // 4. Market Cap USD: eleph.metrics.marketCapUsd
+          let mcapUsd = 6118;
+          if (eleph.metrics?.marketCapUsd) {
+            mcapUsd = Math.round(Number(eleph.metrics.marketCapUsd));
+          }
+
+          applyMetrics(mcapUsd, currentWeth, progressPercent, holders);
         }
       } catch (err) {
-        console.warn("Using baseline curve metrics:", err);
+        console.warn("Failed to fetch fresh block data:", err);
       }
     }
 
@@ -570,7 +585,6 @@
       setTimeout(() => { status.innerText = "COPY"; }, 2000);
     });
 
-    // --- ANIMATION LOOP ---
     let clock = new THREE.Clock();
 
     function animate() {
@@ -586,7 +600,8 @@
       renderer.render(scene, camera);
     }
 
-    applyMetrics(3874, 0.1009, 11);
+    // Set baseline matching current block
+    applyMetrics(6118, 0.1159, 4.45, 13);
     fetchOtomateData();
     setInterval(fetchOtomateData, 8000);
     animate();
