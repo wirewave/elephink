@@ -3,608 +3,325 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elephink ($ELEPH) — Live 3D Dynamic Trunk Tracker</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
+  <title>Elephink — The Pink Elephant of Ink | On Otomate</title>
+  <meta name="description" content="Elephink: never forgets, never small. Token + companion NFTs launching on Otomate.fun on Ink chain. One idea. One economy." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #090312;
-      --card-bg: rgba(22, 10, 40, 0.72);
-      --card-border: rgba(186, 104, 255, 0.22);
-      --primary: #9333ea;
-      --accent: #c084fc;
-      --text: #f3e8ff;
-      --muted: #a78bfa;
-      --green: #22c55e;
+      --obsidian: #131314;
+      --obsidian-2: #1c1c1e;
+      --cream: #F4F0E9;
+      --velvet: #6B4BCC;
+      --lavender: #D2BBFF;
+      --violet: #A476FF;
+      --mint: #6EE7B7;
+      --pink: #FF6B9D;
+      --pink-hot: #FF3D7F;
+      --glass: rgba(255,255,255,0.05);
+      --border: rgba(210,187,255,0.18);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-image: 
-        radial-gradient(circle at 50% 10%, rgba(147, 51, 234, 0.25) 0%, transparent 60%),
-        radial-gradient(circle at 10% 80%, rgba(88, 28, 135, 0.2) 0%, transparent 50%);
+      font-family: 'Outfit', system-ui, sans-serif;
+      background: var(--obsidian);
+      color: var(--cream);
+      line-height: 1.6;
       overflow-x: hidden;
-      padding: 1.5rem 1rem;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 14px;
-      background: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
-    }
-
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--green);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--green);
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(1.2); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    h1 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      background: linear-gradient(135deg, #ffffff 40%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    p.subtitle {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .container {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-      width: 100%;
-      max-width: 1100px;
-    }
-
-    @media (min-width: 900px) {
-      .container {
-        grid-template-columns: 1.2fr 0.8fr;
-      }
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-    }
-
-    .viewport-card {
-      position: relative;
-      height: 520px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #webgl-container {
-      width: 100%;
-      height: 100%;
-      cursor: grab;
-    }
-
-    #webgl-container:active {
-      cursor: grabbing;
-    }
-
-    .viewport-hint {
-      position: absolute;
-      bottom: 16px;
-      left: 16px;
-      font-size: 0.75rem;
-      color: var(--muted);
-      background: rgba(0, 0, 0, 0.5);
-      padding: 4px 10px;
-      border-radius: 8px;
+    .bg-glow {
+      position: fixed;
+      inset: 0;
       pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(164,118,255,0.28), transparent 55%),
+        radial-gradient(700px 400px at 90% 10%, rgba(255,61,127,0.18), transparent 50%),
+        radial-gradient(600px 400px at 50% 100%, rgba(107,75,204,0.2), transparent 50%);
     }
 
-    .dashboard {
-      padding: 1.75rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 1.25rem;
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 6vw;
+      background: rgba(19,19,20,0.72);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
     }
-
-    .stat-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+    .logo {
+      display: flex; align-items: center; gap: 0.7rem;
+      font-weight: 800; letter-spacing: 0.04em; font-size: 1.15rem;
+      text-decoration: none; color: var(--cream);
     }
-
-    .stat-box {
-      background: rgba(10, 4, 20, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      padding: 1.1rem;
-    }
-
-    .stat-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.25rem;
-    }
-
-    .stat-value {
-      font-size: 1.45rem;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .stat-sub {
-      font-size: 0.75rem;
-      color: var(--green);
-      margin-top: 0.2rem;
-      font-weight: 600;
-    }
-
-    .curve-card {
-      background: rgba(10, 4, 20, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      padding: 1.2rem;
-    }
-
-    .curve-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 0.6rem;
-    }
-
-    .progress-track {
-      background: rgba(255, 255, 255, 0.08);
-      height: 12px;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 4.45%;
-      background: linear-gradient(90deg, #9333ea, #c084fc);
-      border-radius: 999px;
-      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
-    }
-
-    .ca-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(168, 85, 247, 0.25);
-      padding: 0.75rem 1rem;
+    .logo-mark {
+      width: 38px; height: 38px;
       border-radius: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      background: linear-gradient(135deg, var(--pink-hot), var(--violet));
+      display: grid; place-items: center;
+      font-size: 1.2rem;
+      box-shadow: 0 0 24px rgba(255,61,127,0.45);
     }
-
-    .ca-box:hover {
-      border-color: var(--accent);
-      background: rgba(168, 85, 247, 0.12);
-    }
-
-    .ca-text {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-right: 8px;
-    }
-
-    .btn-buy {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 1rem;
-      background: linear-gradient(135deg, #a855f7, #7e22ce);
-      color: #fff;
-      font-weight: 700;
-      border-radius: 14px;
-      text-decoration: none;
-      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.35);
+    .nav-links { display: flex; gap: 1.6rem; align-items: center; }
+    .nav-links a { color: var(--lavender); text-decoration: none; font-size: 0.92rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--cream); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: linear-gradient(135deg, var(--pink-hot), var(--violet));
+      color: white; text-decoration: none;
+      padding: 0.7rem 1.25rem; border-radius: 999px;
+      font-weight: 650; font-size: 0.92rem;
+      border: none; cursor: pointer;
+      box-shadow: 0 8px 28px rgba(164,118,255,0.35);
       transition: transform 0.2s, box-shadow 0.2s;
     }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(255,61,127,0.4); }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--cream);
+      box-shadow: none;
+    }
 
-    .btn-buy:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.55);
+    .wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 0 6vw; }
+
+    hero, section { display: block; }
+    .hero {
+      padding: 5.5rem 0 4rem;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .eyebrow {
+      color: var(--lavender);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      line-height: 1.05;
+      font-weight: 700;
+    }
+    h1 em {
+      font-style: italic;
+      background: linear-gradient(90deg, var(--pink), var(--lavender));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    .lede { margin: 1.25rem 0 2rem; color: #d8d2c8; font-size: 1.12rem; max-width: 36rem; }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+    .stats {
+      display: flex; gap: 1.8rem; margin-top: 2.4rem; flex-wrap: wrap;
+    }
+    .stat strong { display: block; font-size: 1.35rem; color: var(--cream); }
+    .stat span { font-size: 0.78rem; color: var(--lavender); letter-spacing: 0.06em; text-transform: uppercase; }
+
+    .mascot {
+      position: relative;
+      display: grid; place-items: center;
+    }
+    .orb {
+      width: min(420px, 90vw); height: min(420px, 90vw);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, #ffb3cc, var(--pink) 28%, var(--violet) 62%, #2a1848 100%);
+      box-shadow: 0 0 80px rgba(255,61,127,0.35), inset 0 -30px 50px rgba(0,0,0,0.25);
+      animation: float 6s ease-in-out infinite;
+      display: grid; place-items: center;
+    }
+    .elephant { font-size: 11rem; filter: drop-shadow(0 20px 20px rgba(0,0,0,0.35)); }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-16px); }
+    }
+    .badge-float {
+      position: absolute; bottom: 12%; right: 6%;
+      background: var(--obsidian-2);
+      border: 1px solid var(--border);
+      padding: 0.7rem 1rem; border-radius: 14px;
+      font-size: 0.82rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    section { padding: 4.5rem 0; }
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      margin-bottom: 0.6rem;
+    }
+    .sub { color: #c9c2b6; max-width: 40rem; margin-bottom: 2.2rem; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      backdrop-filter: blur(8px);
+    }
+    .card h3 { margin: 0.4rem 0 0.5rem; font-size: 1.15rem; }
+    .icon { font-size: 1.6rem; }
+
+    .split {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center;
+    }
+    .token-table { width: 100%; border-collapse: collapse; }
+    .token-table td {
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .token-table td:last-child { text-align: right; color: var(--lavender); font-weight: 600; }
+
+    .roadmap { display: grid; gap: 1rem; }
+    .step {
+      display: grid; grid-template-columns: 80px 1fr;
+      gap: 1rem; align-items: start;
+      padding: 1.2rem 1.4rem;
+      border-left: 3px solid var(--violet);
+      background: var(--glass);
+      border-radius: 0 16px 16px 0;
+    }
+    .step .num { color: var(--pink); font-weight: 800; letter-spacing: 0.08em; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 6vw 3rem;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+      color: #9a948b; font-size: 0.88rem;
+    }
+    footer a { color: var(--lavender); text-decoration: none; }
+
+    @media (max-width: 860px) {
+      .hero, .split, .grid-3 { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .elephant { font-size: 8rem; }
     }
   </style>
 </head>
 <body>
+  <div class="bg-glow"></div>
 
-  <header>
-    <div class="badge">
-      <div class="pulse-dot"></div> Live On-Chain Data (Ink Mainnet)
+  <nav>
+    <a class="logo" href="#">
+      <span class="logo-mark">🐘</span>
+      ELEPHINK
+    </a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#economy">Economy</a>
+      <a href="#nfts">Companions</a>
+      <a href="#roadmap">Roadmap</a>
     </div>
-    <h1>ELEPHINK</h1>
-    <p class="subtitle">Higher the Cap, Longer the Trunk 🐘</p>
-  </header>
+    <a class="btn" href="https://www.otomate.fun/" target="_blank" rel="noopener">Launch on Otomate</a>
+  </nav>
 
-  <div class="container">
-    <div class="card viewport-card">
-      <div id="webgl-container"></div>
-      <div class="viewport-hint">Left click + drag to rotate • Scroll to zoom</div>
-    </div>
-
-    <div class="card dashboard">
+  <div class="wrap">
+    <div class="hero">
       <div>
-        <div class="stat-row">
-          <div class="stat-box">
-            <div class="stat-label">Live Market Cap</div>
-            <div class="stat-value" id="val-mcap">$6,118</div>
-            <div class="stat-sub" id="val-holders">13 Holders</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Trunk Length</div>
-            <div class="stat-value" id="val-trunk">23.2 cm</div>
-            <div class="stat-sub">Live 3D Scaled</div>
-          </div>
+        <p class="eyebrow">On Otomate · Ink Mainnet</p>
+        <h1>Never small.<br /><em>Never forgets.</em></h1>
+        <p class="lede">
+          Elephink is a living idea on Otomate: a token with lore, companion NFTs, and a shared fee economy.
+          One trunk. One herd. One workshop.
+        </p>
+        <div class="hero-cta">
+          <a class="btn" href="https://www.otomate.fun/" target="_blank" rel="noopener">Create / Trade on Otomate</a>
+          <a class="btn btn-ghost" href="#economy">See the economy</a>
         </div>
-
-        <div class="curve-card" style="margin-top: 1rem;">
-          <div class="curve-header">
-            <span class="stat-label">Bonding Curve Progress</span>
-            <span style="font-weight: 800; color: var(--accent);" id="val-percent">4.45%</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" id="progress-fill"></div>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-top: 0.6rem; font-size: 0.75rem; color: var(--muted);">
-            <span id="val-weth">0.1159 / 2.6000 WETH</span>
-            <span>Target: 2.6 WETH</span>
-          </div>
-        </div>
-
-        <div style="margin-top: 1rem;">
-          <div class="stat-label" style="margin-bottom: 0.35rem;">Token Contract Address</div>
-          <div class="ca-box" id="caBtn">
-            <span class="ca-text">0x661f11caa30dbd35dd734e98538c1e1b2f05a9cc</span>
-            <span style="color: var(--accent); font-weight:700;" id="copyStatus">COPY</span>
-          </div>
+        <div class="stats">
+          <div class="stat"><strong>$ELEPHINK</strong><span>Ticker</span></div>
+          <div class="stat"><strong>1,000</strong><span>Companion NFTs</span></div>
+          <div class="stat"><strong>Ink</strong><span>Chain</span></div>
         </div>
       </div>
-
-      <div>
-        <div style="font-size:0.75rem; color:var(--muted); margin-bottom: 0.75rem; text-align:center;">
-          Data Sync: <span style="color:#fff;">Otomate Live Endpoint</span>
-        </div>
-        <a href="https://www.otomate.fun/swap?network=ink&token=0x661f11caa30dbd35dd734e98538c1e1b2f05a9cc" 
-           target="_blank" 
-           class="btn-buy">
-          Swap on Otomate ↗
-        </a>
+      <div class="mascot">
+        <div class="orb"><div class="elephant">🐘</div></div>
+        <div class="badge-float">Ink workshop · fee-sharing herd</div>
       </div>
     </div>
+
+    <section id="about">
+      <p class="eyebrow">The idea</p>
+      <h2>An elephant that writes in ink.</h2>
+      <p class="sub">Elephink is memory made market. Built for Otomate’s model: launch a token, forge companion NFTs, and let the community share the economy — not just the chart.</p>
+      <div class="grid-3">
+        <article class="card">
+          <div class="icon">💡</div>
+          <h3>Lore first</h3>
+          <p>Pink giant of Ink. Slow steps, heavy grooves, unforgettable moves. The herd grows with every holder.</p>
+        </article>
+        <article class="card">
+          <div class="icon">🪙</div>
+          <h3>Token + companions</h3>
+          <p>Launch on Otomate.fun, graduate, then forge a 1,000-piece companion collection tied to trading fees.</p>
+        </article>
+        <article class="card">
+          <div class="icon">🔁</div>
+          <h3>Shared economy</h3>
+          <p>Creators, companion holders, 404 Machine, and $OTO buybacks all sit in the same fee stream.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="economy">
+      <div class="split">
+        <div>
+          <p class="eyebrow">How it lives on Otomate</p>
+          <h2>One token. One collection. One herd.</h2>
+          <p class="sub">Otomate is not only a launcher. Fees from Elephink trades can flow to the creator, companion NFT holders, protocol participants, and $OTO buyback & burn — so the project’s lore becomes an economy.</p>
+          <a class="btn" href="https://www.otomate.fun/" target="_blank" rel="noopener">Open Otomate.fun</a>
+        </div>
+        <div class="card">
+          <table class="token-table">
+            <tr><td>Chain</td><td>Ink</td></tr>
+            <tr><td>Platform</td><td>Otomate.fun</td></tr>
+            <tr><td>Token</td><td>$ELEPHINK</td></tr>
+            <tr><td>Companion NFTs</td><td>1,000</td></tr>
+            <tr><td>Contract</td><td>TBA — paste after launch</td></tr>
+            <tr><td>Pairing</td><td>ETH / as set on launch</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="nfts">
+      <p class="eyebrow">Companion herd</p>
+      <h2>1,000 Elephinks. Shared fees.</h2>
+      <p class="sub">After graduation, forge companion NFTs from Elephink’s image and lore. Holders can share a slice of token trading fees — collectors become part of the economy, not spectators.</p>
+      <div class="grid-3">
+        <article class="card"><h3>01 · Identity</h3><p>Name, ticker, image, lore. The pink elephant is the mark.</p></article>
+        <article class="card"><h3>02 · Creation</h3><p>AI styles or your own art. 1,000 companions linked to the token.</p></article>
+        <article class="card"><h3>03 · Economy</h3><p>Trades feed holders. The herd eats when the market moves.</p></article>
+      </div>
+    </section>
+
+    <section id="roadmap">
+      <p class="eyebrow">Chapters</p>
+      <h2>Roadmap</h2>
+      <div class="roadmap">
+        <div class="step"><div class="num">CH.1</div><div><h3>Workshop</h3><p>Brand, lore, landing page, community channels. Launch token on Otomate.</p></div></div>
+        <div class="step"><div class="num">CH.2</div><div><h3>Graduation</h3><p>Curve → pool. Liquidity, holders, first fee streams.</p></div></div>
+        <div class="step"><div class="num">CH.3</div><div><h3>Forge</h3><p>Companion NFT collection. Fee sharing live for the herd.</p></div></div>
+        <div class="step"><div class="num">CH.4</div><div><h3>Memory</h3><p>Art drops, herd events, partnerships across Ink.</p></div></div>
+      </div>
+    </section>
   </div>
 
-  <script>
-    const TOKEN_CA = "0x661f11caa30dbd35dd734e98538c1e1b2f05a9cc";
-    const TARGET_WETH = 2.6;
-    let targetExtension = 0.0445; // 4.45%
-
-    // --- THREE.JS PURPLE ELEPHANT ---
-    const container = document.getElementById('webgl-container');
-    const scene = new THREE.Scene();
-
-    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-    camera.position.set(0, 1.2, 5.2);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = false;
-    container.appendChild(renderer.domElement);
-
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 + 0.1;
-    controls.minDistance = 3.5;
-    controls.maxDistance = 8.5;
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
-    scene.add(ambientLight);
-
-    const frontLight = new THREE.DirectionalLight(0xd8b4fe, 1.2);
-    frontLight.position.set(3, 4, 5);
-    scene.add(frontLight);
-
-    const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.8);
-    rimLight.position.set(-4, 2, -3);
-    scene.add(rimLight);
-
-    const purpleSkinMat = new THREE.MeshStandardMaterial({
-      color: 0x8b2fc9,
-      roughness: 0.5,
-      metalness: 0.05
-    });
-
-    const purpleBellyMat = new THREE.MeshStandardMaterial({
-      color: 0xb76eeb,
-      roughness: 0.55,
-      metalness: 0.02
-    });
-
-    const eyeMat = new THREE.MeshStandardMaterial({
-      color: 0x0a0a0a,
-      roughness: 0.1,
-      metalness: 0.8
-    });
-
-    const elephant = new THREE.Group();
-    elephant.position.y = -0.5;
-    scene.add(elephant);
-
-    const body = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), purpleSkinMat);
-    body.scale.set(1, 1.15, 0.95);
-    elephant.add(body);
-
-    const belly = new THREE.Mesh(new THREE.SphereGeometry(0.75, 32, 32), purpleBellyMat);
-    belly.position.set(0, -0.1, 0.4);
-    belly.scale.set(0.9, 1.05, 0.5);
-    elephant.add(belly);
-
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.85, 32, 32), purpleSkinMat);
-    head.position.set(0, 1.05, 0.25);
-    elephant.add(head);
-
-    function createEar(isRight) {
-      const earGroup = new THREE.Group();
-      const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 0.05, 32), purpleSkinMat);
-      ear.rotation.x = Math.PI / 2;
-      ear.scale.set(1, 0.1, 1.3);
-      earGroup.add(ear);
-
-      const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.06, 32), purpleBellyMat);
-      inner.rotation.x = Math.PI / 2;
-      inner.scale.set(1, 0.1, 1.3);
-      inner.position.z = 0.01;
-      earGroup.add(inner);
-
-      earGroup.position.set(isRight ? 0.9 : -0.9, 1.15, 0.1);
-      earGroup.rotation.y = isRight ? 0.4 : -0.4;
-      earGroup.rotation.z = isRight ? -0.2 : 0.2;
-      return earGroup;
-    }
-    elephant.add(createEar(false));
-    elephant.add(createEar(true));
-
-    function createEye(x) {
-      const eyeGroup = new THREE.Group();
-      const eyeball = new THREE.Mesh(new THREE.SphereGeometry(0.14, 24, 24), eyeMat);
-      eyeball.scale.set(1, 1.2, 0.6);
-      eyeGroup.add(eyeball);
-
-      const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-      pupil.position.set(0.04, 0.04, 0.07);
-      eyeGroup.add(pupil);
-
-      eyeGroup.position.set(x, 1.15, 0.95);
-      return eyeGroup;
-    }
-    elephant.add(createEye(-0.35));
-    elephant.add(createEye(0.35));
-
-    function createLeg(x, z) {
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.8, 24), purpleSkinMat);
-      leg.position.set(x, -0.9, z);
-      return leg;
-    }
-    elephant.add(createLeg(-0.48, 0.1));
-    elephant.add(createLeg(0.48, 0.1));
-
-    // Proportionally Rigged Trunk
-    const TRUNK_SEGMENTS = 7;
-    const trunkJoints = [];
-    const trunkMeshes = [];
-    let parentJoint = head;
-
-    const baseRadiusTop = 0.28;
-    const baseSegLength = 0.18;
-
-    for (let i = 0; i < TRUNK_SEGMENTS; i++) {
-      const joint = new THREE.Group();
-      const rTop = baseRadiusTop * Math.pow(0.86, i);
-      const rBottom = baseRadiusTop * Math.pow(0.86, i + 1);
-
-      const geom = new THREE.CylinderGeometry(rBottom, rTop, 1, 16);
-      geom.translate(0, -0.5, 0);
-
-      const segMesh = new THREE.Mesh(geom, purpleSkinMat);
-      joint.add(segMesh);
-      trunkMeshes.push(segMesh);
-
-      if (i === 0) {
-        joint.position.set(0, -0.2, 0.7);
-      } else {
-        joint.position.set(0, -baseSegLength, 0);
-      }
-
-      parentJoint.add(joint);
-      trunkJoints.push(joint);
-      parentJoint = joint;
-    }
-
-    function updateTrunkPhysics(progressRatio, t) {
-      const lengthMultiplier = 1.0 + (progressRatio * 3.2);
-      const currentSegLength = baseSegLength * lengthMultiplier;
-
-      for (let i = 0; i < TRUNK_SEGMENTS; i++) {
-        trunkMeshes[i].scale.set(1, currentSegLength, 1);
-        if (i > 0) {
-          trunkJoints[i].position.y = -currentSegLength;
-        }
-      }
-
-      const idleWave = Math.sin(t * 2) * 0.04;
-      const baseLift = -0.2 - (progressRatio * 0.85);
-      const curlStep = (0.35 * (1 - progressRatio)) - (0.28 * progressRatio);
-
-      trunkJoints[0].rotation.x = baseLift + idleWave;
-      for (let i = 1; i < TRUNK_SEGMENTS; i++) {
-        trunkJoints[i].rotation.x = curlStep + (idleWave * 0.5);
-        trunkJoints[i].rotation.z = Math.cos(t * 1.5 + i) * (0.01 + progressRatio * 0.03);
-      }
-    }
-
-    window.addEventListener('resize', () => {
-      camera.aspect = container.clientWidth / container.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
-    });
-
-    // --- APPLY METRICS TO UI ---
-    function applyMetrics(mcap, wethAmount, progressPercent, holdersCount) {
-      targetExtension = progressPercent / 100;
-      
-      document.getElementById('val-mcap').innerText = `$${Number(mcap).toLocaleString()}`;
-      document.getElementById('val-percent').innerText = `${progressPercent.toFixed(2)}%`;
-      document.getElementById('progress-fill').style.width = `${progressPercent.toFixed(2)}%`;
-      document.getElementById('val-weth').innerText = `${Number(wethAmount).toFixed(4)} / ${TARGET_WETH.toFixed(4)} WETH`;
-      
-      if (holdersCount !== undefined && holdersCount !== null) {
-        document.getElementById('val-holders').innerText = `${holdersCount} Holders`;
-      }
-
-      const cm = (15 + targetExtension * 185).toFixed(1);
-      document.getElementById('val-trunk').innerText = `${cm} cm`;
-    }
-
-    // --- PARSE EXACT OTOMATE CATALOG PAYLOAD ---
-    async function fetchOtomateData() {
-      const timestamp = Date.now();
-      const directUrl = `https://www.otomate.fun/api/launcher037/catalog?limit=1&after=0x661f11caa30dbd35dd734e98538c1e1b2f05a9cb`;
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}&_t=${timestamp}`;
-
-      try {
-        let res;
-        try {
-          res = await fetch(directUrl, { cache: "no-store" });
-          if (!res.ok) throw new Error();
-        } catch {
-          res = await fetch(proxyUrl, { cache: "no-store" });
-        }
-
-        const data = await res.json();
-        
-        // Target projects list in the exact schema
-        const projects = data.projects || (Array.isArray(data) ? data : [data]);
-        const eleph = projects.find(p => (p.token || "").toLowerCase() === TOKEN_CA.toLowerCase()) || projects[0];
-
-        if (eleph) {
-          // 1. Holders: eleph.holders.count
-          const holders = eleph.holders?.count ? parseInt(eleph.holders.count) : 13;
-
-          // 2. Curve Progress: eleph.metrics.progressBps (445 -> 4.45%)
-          let progressPercent = 4.45;
-          if (eleph.metrics?.progressBps !== undefined) {
-            progressPercent = eleph.metrics.progressBps / 100;
-          }
-
-          // 3. WETH Contributed: eleph.metrics.currentQuoteRaw (in wei)
-          let currentWeth = 0.1159;
-          if (eleph.metrics?.currentQuoteRaw) {
-            currentWeth = Number(eleph.metrics.currentQuoteRaw) / 1e18;
-          }
-
-          // 4. Market Cap USD: eleph.metrics.marketCapUsd
-          let mcapUsd = 6118;
-          if (eleph.metrics?.marketCapUsd) {
-            mcapUsd = Math.round(Number(eleph.metrics.marketCapUsd));
-          }
-
-          applyMetrics(mcapUsd, currentWeth, progressPercent, holders);
-        }
-      } catch (err) {
-        console.warn("Failed to fetch fresh block data:", err);
-      }
-    }
-
-    document.getElementById('caBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(TOKEN_CA);
-      const status = document.getElementById('copyStatus');
-      status.innerText = "COPIED!";
-      setTimeout(() => { status.innerText = "COPY"; }, 2000);
-    });
-
-    let clock = new THREE.Clock();
-
-    function animate() {
-      requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
-
-      elephant.position.y = -0.5 + Math.sin(t * 1.5) * 0.04;
-      head.rotation.y = Math.sin(t * 0.8) * 0.05;
-
-      updateTrunkPhysics(targetExtension, t);
-
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // Set baseline matching current block
-    applyMetrics(6118, 0.1159, 4.45, 13);
-    fetchOtomateData();
-    setInterval(fetchOtomateData, 8000);
-    animate();
-  </script>
+  <footer>
+    <div>© 2026 Elephink · Built for Otomate on Ink</div>
+    <div>
+      <a href="https://www.otomate.fun/" target="_blank" rel="noopener">Otomate.fun</a> ·
+      <a href="https://x.com/otomate_trade" target="_blank" rel="noopener">Otomate X</a> ·
+      <a href="#">https://x.com/ElephOnInk</a> ·
+    </div>
+  </footer>
 </body>
 </html>
